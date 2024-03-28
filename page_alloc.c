@@ -363,7 +363,6 @@ static inline struct hyp_page *node_to_page(struct list_head *node)
 /*@ requires let phys = (u64) node + (u64) hyp_physvirt_offset @*/
 /*@ requires let p_i = phys / page_size() @*/
 /*@ requires let page = array_shift<struct hyp_page>(__hyp_vmemmap, p_i) @*/
-/*@ requires (u64) page < shift_left(1u64, 64u64) - 4u64 @*/
 /*@ requires mod((u64) hyp_physvirt_offset, page_size ()) == 0u64 @*/
 /*@ requires mod((u64) __hyp_vmemmap, (u64) (sizeof<struct hyp_page>)) == 0u64 @*/
 /*@ ensures return == page @*/
@@ -635,6 +634,7 @@ void hyp_get_page(struct hyp_pool *pool, void *addr)
 void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
 /*@ accesses hyp_physvirt_offset; __hyp_vmemmap; cn_virt_ptr @*/
 /*@ requires take H = Hyp_pool(pool, __hyp_vmemmap, cn_virt_ptr, hyp_physvirt_offset) @*/
+/*@ requires 0i64 <= hyp_physvirt_offset @*/ /* FIXME from node_to_page, suspicious */
 /*@ ensures  take H2 = Hyp_pool(pool, __hyp_vmemmap, cn_virt_ptr, hyp_physvirt_offset);
              take ZR = ZeroPage(return, (return != NULL), order);
              {__hyp_vmemmap} unchanged;
@@ -643,7 +643,6 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
 {
 	struct hyp_page *p = NULL; /* struct hyp_page *p; */
 	u8 i = order;
-	/*CN*/ /*@extract Owned<struct list_head>, i;@*/
 	/* ----- hyp_spin_lock(&pool->lock); */
 
 	/* Look for a high-enough-order page */
@@ -654,8 +653,8 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
 			{pool} unchanged; {order} unchanged;
 			{__hyp_vmemmap} unchanged; {hyp_physvirt_offset} unchanged @*/
 		/*CN*/{
-			/*CN*/ /*@extract Owned<struct list_head>, i;@*/
-			/*CN*/ /*@instantiate freeArea_cell_wf, i;@*/
+			/*CN*/ /*@extract Owned<struct list_head>, (u64) i;@*/
+			/*CN*/ /*@instantiate freeArea_cell_wf, (u8) i;@*/
 			/*CN*/if (!(i < pool->max_order && list_empty(&pool->free_area[i]))) break;
 			i++;
 		/*CN*/}
@@ -664,8 +663,8 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
 		return NULL;
 	}
 
-	/*CN*//*@ instantiate freeArea_cell_wf, i; @*/
-	/*CN*//*@extract Owned<struct list_head>, i;@*/
+	/*CN*//*@ instantiate freeArea_cell_wf, (u8) i; @*/
+	/*CN*//*@extract Owned<struct list_head>, (u64) i;@*/
 	/* Extract it from the tree at the right order */
 	p = node_to_page(pool->free_area[i].next);
 	// p = hyp_virt_to_page(pool->free_area[i].next);
