@@ -34,19 +34,19 @@ extern struct hyp_page *__hyp_vmemmap;
 #define __hyp_va(phys)	((phys_addr_t)(phys) - hyp_physvirt_offset)
 
 static inline void *hyp_phys_to_virt(phys_addr_t phys)
-/*@ accesses hyp_physvirt_offset; cn_virt_base @*/
-/*@ requires let virt = phys - (u64) hyp_physvirt_offset @*/
-/*@ ensures {hyp_physvirt_offset} unchanged @*/
-/*@ ensures (u64) return == virt @*/
+/*@ accesses hyp_physvirt_offset; cn_virt_base; @*/
+/*@ requires let virt = phys - (u64) hyp_physvirt_offset; @*/
+/*@ ensures {hyp_physvirt_offset} unchanged; @*/
+/*@ ensures (u64) return == virt; @*/
 {
 	return __cerbvar_copy_alloc_id(__hyp_va(phys), cn_virt_base);
 }
 
 static inline phys_addr_t hyp_virt_to_phys(void *addr)
-/*@ accesses hyp_physvirt_offset @*/
-/*@ requires let phys = cn__hyp_pa(hyp_physvirt_offset, addr) @*/
-/*@ ensures {hyp_physvirt_offset} unchanged @*/
-/*@ ensures return == phys @*/
+/*@ accesses hyp_physvirt_offset; @*/
+/*@ requires let phys = cn__hyp_pa(hyp_physvirt_offset, addr); @*/
+/*@ ensures {hyp_physvirt_offset} unchanged; @*/
+/*@ ensures return == phys; @*/
 {
 	return __hyp_pa(addr);
 }
@@ -72,12 +72,12 @@ function (u64) max_pfn ()
 @*/
 
 static inline u64 hyp_page_to_pfn(struct hyp_page *page)
-/*@ accesses __hyp_vmemmap @*/
-/*@ requires let offs = ((u64) page) - ((u64) __hyp_vmemmap) @*/
-/*@ requires offs <= max_pfn () * (sizeof<struct hyp_page>) @*/
-/*@ requires mod(offs, sizeof<struct hyp_page>) == 0u64 @*/
-/*@ ensures return == offs / (sizeof<struct hyp_page>) @*/
-/*@ ensures {__hyp_vmemmap} unchanged @*/
+/*@ accesses __hyp_vmemmap; @*/
+/*@ requires let offs = ((u64) page) - ((u64) __hyp_vmemmap); @*/
+/*@ requires offs <= max_pfn () * (sizeof<struct hyp_page>); @*/
+/*@ requires mod(offs, sizeof<struct hyp_page>) == 0u64; @*/
+/*@ ensures return == offs / (sizeof<struct hyp_page>); @*/
+/*@ ensures {__hyp_vmemmap} unchanged; @*/
 {
   return hyp_page_to_pfn_macro(page);
 }
@@ -90,15 +90,15 @@ static inline u64 hyp_page_to_pfn(struct hyp_page *page)
 /* } */
 
 static inline int hyp_page_count(struct hyp_pool *pool, void *addr)
-/*@ accesses hyp_physvirt_offset; __hyp_vmemmap; cn_virt_base @*/
-/*@ requires let hyp_vmemmap = __hyp_vmemmap @*/
-/*@ requires let phys = cn__hyp_pa(hyp_physvirt_offset, addr) @*/
-/*@ requires take H = Hyp_pool(pool, hyp_vmemmap, cn_virt_base, hyp_physvirt_offset) @*/
-/*@ requires H.pool.range_start <= phys; phys < H.pool.range_end @*/
-/*@ ensures take H2 = Hyp_pool(pool, hyp_vmemmap, cn_virt_base, hyp_physvirt_offset) @*/
-/*@ ensures {hyp_physvirt_offset} unchanged; {hyp_vmemmap} unchanged @*/
-/*@ ensures H2.pool == {H.pool}@start @*/
-/*@ ensures (u16) return == ((H2.vmemmap)[phys / (page_size())]).refcount @*/
+/*@ accesses hyp_physvirt_offset; __hyp_vmemmap; cn_virt_base; @*/
+/*@ requires let hyp_vmemmap = __hyp_vmemmap; @*/
+/*@ requires let phys = cn__hyp_pa(hyp_physvirt_offset, addr); @*/
+/*@ requires take H = Hyp_pool(pool, hyp_vmemmap, cn_virt_base, hyp_physvirt_offset); @*/
+/*@ requires H.pool.range_start <= phys; phys < H.pool.range_end; @*/
+/*@ ensures take H2 = Hyp_pool(pool, hyp_vmemmap, cn_virt_base, hyp_physvirt_offset); @*/
+/*@ ensures {hyp_physvirt_offset} unchanged; {hyp_vmemmap} unchanged; @*/
+/*@ ensures H2.pool == {H.pool}@start; @*/
+/*@ ensures (u16) return == ((H2.vmemmap)[phys / (page_size())]).refcount; @*/
 {
 	struct hyp_page *p = hyp_virt_to_page(addr);
 	/*CN*//*@instantiate good<struct hyp_page>, cn_hyp_page_to_pfn(__hyp_vmemmap,p);@*/
@@ -114,45 +114,45 @@ static inline int hyp_page_count(struct hyp_pool *pool, void *addr)
 #define USHRT_MAX ((unsigned short)~0U)
 
 static inline void hyp_page_ref_inc(struct hyp_page *p)
-/*@ requires take O = Owned(p) @*/
-/*@ requires (*p).refcount < (shift_left(1u16,16u16) - 1u16) @*/
-/*@ ensures take OR = Owned(p) @*/
-/*@ ensures {(*p).order} unchanged @*/
-/*@ ensures (*p).refcount == {(*p).refcount}@start + 1u16 @*/
+/*@ requires take O = Owned(p); @*/
+/*@ requires (*p).refcount < (shift_left(1u16,16u16) - 1u16); @*/
+/*@ ensures take OR = Owned(p); @*/
+/*@ ensures {(*p).order} unchanged; @*/
+/*@ ensures (*p).refcount == {(*p).refcount}@start + 1u16; @*/
 {
 	BUG_ON(p->refcount == USHRT_MAX);
 	p->refcount++;
 }
 
 static inline void hyp_page_ref_dec(struct hyp_page *p)
-/*@ requires take O = Owned(p) @*/
-/*@ requires (*p).refcount > 0u16 @*/
-/*@ ensures take OR = Owned(p) @*/
-/*@ ensures {(*p).order} unchanged @*/
-/*@ ensures (*p).refcount == {(*p).refcount}@start - 1u16 @*/
+/*@ requires take O = Owned(p); @*/
+/*@ requires (*p).refcount > 0u16; @*/
+/*@ ensures take OR = Owned(p); @*/
+/*@ ensures {(*p).order} unchanged; @*/
+/*@ ensures (*p).refcount == {(*p).refcount}@start - 1u16; @*/
 {
 	BUG_ON(!p->refcount);
 	p->refcount--;
 }
 
 static inline int hyp_page_ref_dec_and_test(struct hyp_page *p)
-/*@ requires take O = Owned(p) @*/
-/*@ requires (*p).refcount > 0u16 @*/
-/*@ ensures take OR = Owned(p) @*/
-/*@ ensures {(*p).order} unchanged @*/
-/*@ ensures (*p).refcount == {(*p).refcount}@start - 1u16 @*/
-/*@ ensures return == (((*p).refcount == 0u16) ? 1i32 : 0i32) @*/
+/*@ requires take O = Owned(p); @*/
+/*@ requires (*p).refcount > 0u16; @*/
+/*@ ensures take OR = Owned(p); @*/
+/*@ ensures {(*p).order} unchanged; @*/
+/*@ ensures (*p).refcount == {(*p).refcount}@start - 1u16; @*/
+/*@ ensures return == (((*p).refcount == 0u16) ? 1i32 : 0i32); @*/
 {
 	hyp_page_ref_dec(p);
 	return (p->refcount == 0);
 }
 
 static inline void hyp_set_page_refcounted(struct hyp_page *p)
-/*@ requires take O = Owned(p) @*/
-/*@ requires (*p).refcount == 0u16 @*/
-/*@ ensures take OR = Owned(p) @*/
-/*@ ensures {(*p).order} unchanged @*/
-/*@ ensures (*p).refcount == 1u16 @*/
+/*@ requires take O = Owned(p); @*/
+/*@ requires (*p).refcount == 0u16; @*/
+/*@ ensures take OR = Owned(p); @*/
+/*@ ensures {(*p).order} unchanged; @*/
+/*@ ensures (*p).refcount == 1u16; @*/
 {
 	BUG_ON(p->refcount);
 	p->refcount = 1;
