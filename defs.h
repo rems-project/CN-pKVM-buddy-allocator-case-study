@@ -351,7 +351,7 @@ Hyp_pool_ex1 (
             && ((V[i]).order != (hyp_no_order ()))
             && ((not (excluded (ex, i)))))
     {vmemmap_l_wf (i, physvirt_offset, virt_ptr, V, APs, pool_l, pool, ex)});
-  assert (each(u8 i; i < pool.max_order)
+  assert (each(u8 i; 0u8 <= i && i < pool.max_order)
               {freeArea_cell_wf (i, physvirt_offset, virt_ptr, V, APs, pool_l, pool, ex)});
   return {pool: pool, vmemmap: V, APs: APs};
 }
@@ -390,7 +390,7 @@ Hyp_pool_ex2 (
             && ((V[i]).order != (hyp_no_order ()))
             && ((not (excluded (ex, i)))))
     {vmemmap_l_wf (i, physvirt_offset, virt_ptr, V, APs, pool_l, pool, ex)});
-  assert (each(u8 i; i < pool.max_order)
+  assert (each(u8 i; 0u8 <= i && i < pool.max_order)
               {freeArea_cell_wf (i, physvirt_offset, virt_ptr, V, APs, pool_l, pool, ex)});
   return {pool: pool, vmemmap: V, APs: APs};
 }
@@ -427,7 +427,7 @@ Hyp_pool (
             && ((V[i]).order != (hyp_no_order ()))
             && ((not (excluded (ex, i)))))
     {vmemmap_l_wf (i, physvirt_offset, virt_ptr, V, APs, pool_l, P, ex)});
-  assert (each(u8 i; i < P.max_order)
+  assert (each(u8 i; 0u8 <= i && i < P.max_order)
               {freeArea_cell_wf (i, physvirt_offset, virt_ptr, V, APs, pool_l, P, ex)});
   return {pool: P, vmemmap: V, APs: APs};
 }
