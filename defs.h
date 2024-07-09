@@ -267,7 +267,9 @@ function (boolean) hyp_pool_wf (pointer pool_pointer, struct hyp_pool pool,
         || (range_end_virt <= ((u64) pool_pointer)))
 }
 
-function (u8) get_order_uf (u32 size)
+function (u8) get_order_uf (u32 size) {
+  (u8) bw_fls_uf(shift_right(size - 1u32, 12u32))
+}
 
 function (pointer) virt (pointer phys, i64 physvirt_offset) {
   array_shift<char>(phys, (0i64 - physvirt_offset))
@@ -325,7 +327,9 @@ predicate void AllocatorPageZeroPart (pointer zero_start, u8 order)
   return;
 }
 
-function (struct list_head) todo_default_list_head ()
+function (struct list_head) todo_default_list_head () {
+  struct list_head { prev : NULL, next : NULL }
+}
 
 predicate struct list_head AllocatorPage
     (pointer vbase, bool guard, u8 order)
