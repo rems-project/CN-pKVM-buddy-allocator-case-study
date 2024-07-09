@@ -691,14 +691,7 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
     return CN_COPY_ALLOC_ID(hyp_page_to_virt(p), cn_virt_ptr);
 }
 
-/* NOTE: as above, we add a bogus empty body for this function, to
-   work around a frontend limitation. */
-static inline const int get_order(unsigned int size)
-/*@ trusted; @*/
-/*@ requires (u64) size >= page_size(); @*/
-/*@ ensures return == (i32) get_order_uf(size); @*/
-/*@ ensures return > 0i32; @*/
-{}
+#include "getorder.h"
 
 int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
           unsigned int reserved_pages)
@@ -739,7 +732,7 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
     /*@ inv each(u64 j; j < (u64) i){((*pool).free_area[j]).next == array_shift<struct list_head>(pool, j) }; @*/
     /*@ inv {__hyp_vmemmap} unchanged; {pool} unchanged; {hyp_physvirt_offset} unchanged; {pfn} unchanged; {nr_pages} unchanged; {reserved_pages} unchanged; @*/
     /*@ inv 0i32 <= i; i <= (i32) (*pool).max_order; (*pool).max_order > 0u8; (*pool).max_order <= 11u8; @*/
-    /*@ inv let order = get_order_uf((nr_pages + 1u32)*((u32) page_size())); @*/
+    /*@ inv let order = get_order_uf(((u64) nr_pages + 1u64)*(page_size())); @*/
     /*@ inv (*pool).max_order == (11u8 < order ? 11u8 : order); @*/
     /*@ inv phys == pfn * page_size(); @*/
     {
@@ -764,7 +757,7 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
     /*@ inv (*pool).range_end == end; @*/
     /*@ inv (*pool).max_order > 0u8; @*/
     /*@ inv (*pool).max_order <= 11u8; @*/
-    /*@ inv let order = get_order_uf((nr_pages + 1u32)*((u32) page_size())); @*/
+    /*@ inv let order = get_order_uf(((u64)nr_pages + 1u64)*(page_size())); @*/
     /*@ inv (*pool).max_order == (11u8 < order ? 11u8 : order); @*/
     /*@ inv hyp_pool_wf(pool, (*pool), __hyp_vmemmap, hyp_physvirt_offset); @*/
     /*@ inv p == array_shift<struct hyp_page>(__hyp_vmemmap, pfn); @*/
