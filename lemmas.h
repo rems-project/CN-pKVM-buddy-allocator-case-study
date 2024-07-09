@@ -1,5 +1,5 @@
 // define intptr_t a hacky way, for lemmas 
-/*CN*/ typedef u64 intptr_t;
+// /*CN*/ typedef u64 intptr_t;
 /*@
 lemma order_dec_inv (u64 pool_range_end, // phys_addr_t
                      u64 pfn, // u64

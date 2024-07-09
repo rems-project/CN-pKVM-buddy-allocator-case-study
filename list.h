@@ -3,9 +3,9 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
 #define list_entry(ptr, type, member) \
-	container_of(ptr, type, member)
+    container_of(ptr, type, member)
 #define list_first_entry(ptr, type, member) \
-	list_entry((ptr)->next, type, member)
+    list_entry((ptr)->next, type, member)
 
 static inline int list_empty(const struct list_head *head)
 /*@ requires take O = Owned(head); @*/
@@ -14,8 +14,8 @@ static inline int list_empty(const struct list_head *head)
 /*@ ensures O == OR; @*/
 /*@ ensures return == (((*head).next == head) ? 1i32 : 0i32); @*/
 {
-	/* return READ_ONCE(head->next) == head; */
-	return head->next == head;
+    /* return READ_ONCE(head->next) == head; */
+    return head->next == head;
 }
 
 /* renamed list to llist to avoid clash with CN keyword list */
@@ -24,15 +24,15 @@ static inline void INIT_LIST_HEAD(struct list_head *llist)
 /*@ ensures take OR = Owned(llist); @*/
 /*@ ensures (*llist).next == llist; (*llist).prev == llist; @*/
 {
-	/* WRITE_ONCE (llist->next, llist); */
-	llist->next = llist;
-	llist->prev = llist;
+    /* WRITE_ONCE (llist->next, llist); */
+    llist->next = llist;
+    llist->prev = llist;
 }
 
 static inline bool __list_del_entry_valid(struct list_head *entry)
 /*@ ensures return == 1u8; @*/
 {
-	return true;
+    return true;
 }
 
 static inline void __list_del(struct list_head * prev, struct list_head * next)
@@ -70,10 +70,10 @@ static inline void __list_del_entry(struct list_head *entry)
 {
         /*@ split_case (*entry).prev != entry; @*/
         /*@ split_case (*entry).prev != (*entry).next; @*/
-	if (!__list_del_entry_valid(entry))
-		return;
+    if (!__list_del_entry_valid(entry))
+        return;
 
-	__list_del(entry->prev, entry->next);
+    __list_del(entry->prev, entry->next);
 }
 
 static inline void list_del_init(struct list_head *entry)
@@ -92,24 +92,26 @@ static inline void list_del_init(struct list_head *entry)
 /*@ ensures (prev == next) || (O3R.prev == prev); @*/
 /*@ ensures (prev != next) || ((*prev).prev == prev); @*/
 {
-        /*CN*/ if(entry->prev != entry);
-        /*CN*/ if(entry->prev != entry->next);
-	__list_del_entry(entry);
-	INIT_LIST_HEAD(entry);
+        /*CN*/ if(entry->prev != entry)
+        ;
+        /*CN*/ if(entry->prev != entry->next)
+        ;
+    __list_del_entry(entry);
+    INIT_LIST_HEAD(entry);
 }
 
 static inline bool __list_add_valid(struct list_head *new,
-				struct list_head *prev,
-				struct list_head *next)
+                struct list_head *prev,
+                struct list_head *next)
 /*@ ensures return == 1u8; @*/
 {
-	return true;
+    return true;
 }
 
 
 static inline void __list_add(struct list_head *new,
-			      struct list_head *prev,
-			      struct list_head *next)
+                  struct list_head *prev,
+                  struct list_head *next)
 /*@ requires take O1 = Owned(new); take O2 = Owned(prev); take O3 = O_struct_list_head(next, prev != next); @*/
 /*@ ensures take O1R = Owned(new); take O2R = Owned(prev); take O3R = O_struct_list_head(next, prev != next); @*/
 /*@ ensures (prev == next) || {(*prev).prev} unchanged; @*/
@@ -119,15 +121,15 @@ static inline void __list_add(struct list_head *new,
 /*@ ensures (prev != next) || ((*prev).prev == new); @*/
 /*@ ensures (*new).next == next; (*new).prev == prev; @*/
 {
-	if (!__list_add_valid(new, prev, next))
-		return;
+    if (!__list_add_valid(new, prev, next))
+        return;
 
         /*@ split_case prev != next; @*/
-	next->prev = new;
-	new->next = next;
-	new->prev = prev;
-	/* WRITE_ONCE (prev->next, new); */
-	prev->next = new;
+    next->prev = new;
+    new->next = next;
+    new->prev = prev;
+    /* WRITE_ONCE (prev->next, new); */
+    prev->next = new;
 }
 
 
@@ -146,5 +148,5 @@ static inline void list_add_tail(struct list_head *new, struct list_head *head)
 /*@ ensures (*new).next == next; (*new).prev == prev; @*/
 {
         /*@ split_case (*head).prev != head; @*/
-	__list_add(new, head->prev, head);
+    __list_add(new, head->prev, head);
 }

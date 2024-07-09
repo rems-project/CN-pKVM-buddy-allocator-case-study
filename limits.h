@@ -2,4 +2,4 @@
 
 /* SPDX-License-Identifier: GPL-2.0 */
 
-#define UINT_MAX	(~0U)
+#define UINT_MAX    (~0U)
