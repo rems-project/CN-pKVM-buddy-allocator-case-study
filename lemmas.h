@@ -132,9 +132,7 @@ lemma attach_inc_loop (map<u64, struct hyp_page> V,
  ensures each(u64 i; start_i <= i && i < end_i) { page_group_ok(i, V[buddy_i: buddy_page,min_i: min_page], pool) };
 
 
-function (u64) calc_buddy(u64 addr, u8 order) {
-       xor_uf(addr, shift_left(page_size(), (u64) order))
-}
+
 
 // TODO: is this (and other) lemma even useful anymore?
 lemma find_buddy_xor(u64 addr_i, // intptr_t

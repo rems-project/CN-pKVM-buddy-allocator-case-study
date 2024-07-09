@@ -3,12 +3,6 @@ function (pointer) copy_alloc_id_cn(u64 x, pointer p) {
     array_shift<char>(p, x - (u64) p)
 }
 
-function (u64) pfn_buddy (u64 x, u8 sz)
-function (boolean) order_aligned (u64 x, u8 sz)
-function (u64) order_align (u64 x, u8 sz)
-function (boolean) page_aligned (u64 x, u8 sz)
-function (u64) page_size_of_order (u8 sz)
-
 function (u64) page_size () { 4096u64 }
 function (u8) max_order () { 11u8 }
 function (u8) hyp_no_order () { 255u8 }
@@ -54,6 +48,36 @@ function (pointer) cn_hyp_page_to_virt(pointer virt_ptr, i64 physvirtoffset,
                                        pointer hypvmemmap, pointer page) {
   cn__hyp_va(virt_ptr, physvirtoffset, cn_hyp_page_to_phys(hypvmemmap, page))
 }
+
+function (u64) calc_buddy(u64 addr, u8 order) {
+       xor_uf(addr, shift_left(page_size(), (u64) order))
+}
+
+function (u64) pfn_buddy (u64 x, u8 order) {
+  cn_hyp_phys_to_pfn (calc_buddy(cn_hyp_pfn_to_phys(x), order))
+}
+
+// taking the definition from Buddy_Aligned.v
+function (boolean) order_aligned (u64 x, u8 order) {
+  mod(x, shift_left (1u64, (u64) order)) == 0u64
+}
+
+// taking the definition from Buddy_Aligned.v
+function (u64) order_align (u64 x, u8 order) {
+  x - mod(x, shift_left (1u64, (u64) order))
+}
+
+// taking the definition from Pages_Aligned.v
+function (u64) page_size_of_order (u8 order) {
+  shift_left(1u64, (u64) order + 12u64)
+}
+
+// taking the definition from Pages_Aligned.v
+function (boolean) page_aligned (u64 ptr, u8 order) {
+  mod(ptr, page_size_of_order(order)) == 0u64
+}
+
+
 
 
 type_synonym excludes = {boolean any, boolean do_ex1, u64 ex1, boolean do_ex2, u64 ex2}
