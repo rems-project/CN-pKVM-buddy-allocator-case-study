@@ -1,5 +1,5 @@
 /*@
-function (pointer) copy_alloc_id(u64 x, pointer p) {
+function (pointer) copy_alloc_id_cn(u64 x, pointer p) {
     array_shift<char>(p, x - (u64) p)
 }
 
@@ -46,7 +46,7 @@ function (u64) cn_hyp_page_to_phys(pointer hypvmemmap, pointer page) {
 
 // copied and adjusted from the corresponding macro definition in memory.h 
 function (pointer) cn__hyp_va(pointer virt_ptr, i64 physvirtoffset, u64 phys) {
-  copy_alloc_id((u64) ((i64) phys - physvirtoffset), virt_ptr)
+  copy_alloc_id_cn((u64) ((i64) phys - physvirtoffset), virt_ptr)
 }
 
 // copied and adjusted from the corresponding macro definition in memory.h 

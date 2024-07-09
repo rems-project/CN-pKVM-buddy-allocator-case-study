@@ -13,6 +13,14 @@
 #define bool _Bool
 #define true 1
 
+void *copy_alloc_id(unsigned long long i, void *p) { 
+	(unsigned long long) p;
+	return (void*) i;
+}
+
+
+#define CN_COPY_ALLOC_ID(x,p) copy_alloc_id((x), (p))
+
 #include "const.h"
 
 #define PAGE_SHIFT		12 /* CP: we fix a value for PAGE_SHIFT */
@@ -27,8 +35,9 @@
 #include "minmax.h"
 #include "memory.h"
 #include "gfp.h"
+#include "defs.h"
+#include "lemmas.h"
 
-#define CN_COPY_ALLOC_ID(x,p) __cerbvar_copy_alloc_id((x), (p))
 
 /* NOTE: we give memset a bogus empty body to overcome a limitation of
    the current CN frontend (function declarations without body loose
@@ -44,7 +53,8 @@ void memset(void *b, char c, size_t len)
 
 
 struct hyp_page *__hyp_vmemmap;
-/*CN*/ void *cn_virt_ptr;
+/*CN*/ 
+void *cn_virt_ptr;
 
 /*
  * Index the hyp_vmemmap to find a potential buddy page, but make no assumption
@@ -68,8 +78,6 @@ struct hyp_page *__hyp_vmemmap;
  *   __find_buddy_nocheck(pool, page 2, order 0) => page 3
  */
 
-#include "defs.h"
-#include "lemmas.h"
 
 static struct hyp_page *__find_buddy_nocheck(struct hyp_pool *pool,
 					     struct hyp_page *p,
@@ -230,8 +238,10 @@ static inline void page_remove_from_list_pool(struct hyp_pool *pool, struct hyp_
 	/*CN*//*@extract AllocatorPage, cn_hyp_virt_to_pfn(hyp_physvirt_offset, node_next); @*/
         /*CN*/void *free_node = &pool->free_area[p->order];
 	/*CN*/if (node_prev != node) {
-		/*CN*/if (node_prev != free_node);
-		/*CN*/if (node_next != node_prev && node_next != free_node);
+		/*CN*/if (node_prev != free_node)
+		;
+		/*CN*/if (node_next != node_prev && node_next != free_node)
+		;
 	/*CN*/};
 	page_remove_from_list(p);
 }

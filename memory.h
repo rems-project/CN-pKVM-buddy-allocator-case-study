@@ -39,7 +39,7 @@ static inline void *hyp_phys_to_virt(phys_addr_t phys)
 /*@ ensures {hyp_physvirt_offset} unchanged; @*/
 /*@ ensures (u64) return == virt; @*/
 {
-	return __cerbvar_copy_alloc_id(__hyp_va(phys), cn_virt_base);
+	return CN_COPY_ALLOC_ID(__hyp_va(phys), cn_virt_base);
 }
 
 static inline phys_addr_t hyp_virt_to_phys(void *addr)
