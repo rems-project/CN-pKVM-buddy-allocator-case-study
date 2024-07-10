@@ -278,7 +278,7 @@ function (pointer) virt (pointer phys, i64 physvirt_offset) {
 
 predicate void Byte (pointer virt)
 {
-  take B = Owned<char>(virt);
+  take B = Block<char>(virt);
   return;
 }
 
