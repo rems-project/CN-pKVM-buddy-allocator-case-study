@@ -13,6 +13,7 @@
 #define bool _Bool
 #define true 1
 
+#pragma clang diagnostic ignored "-Wunused-value"
 void *copy_alloc_id(unsigned long long i, void *p) { 
     (unsigned long long) p;
     return (void*) i;
@@ -23,7 +24,8 @@ void *copy_alloc_id(unsigned long long i, void *p) {
 
 #include "const.h"
 
-#define PAGE_SHIFT        12 /* CP: we fix a value for PAGE_SHIFT */
+/* CP: we fix a value for PAGE_SHIFT */
+#define PAGE_SHIFT        12
 #include "page-def.h"
 #include "limits.h"
 #include "mmzone.h"
@@ -43,12 +45,13 @@ void *copy_alloc_id(unsigned long long i, void *p) {
    the current CN frontend (function declarations without body loose
    the variable name information that we rely on in the
    specifications).) */
-void memset(void *b, char c, size_t len)
-/*@ trusted; @*/
-/*@ requires let b_i = (u64) b; @*/
-/*@ requires take B = each (u64 i; b_i <= i && i < b_i+len){Byte(array_shift<char>(NULL, i))}; @*/
-/*@ ensures take BR = each (u64 i; b_i <= i && i < b_i+len){ByteV(array_shift<char>(NULL,i), c)}; @*/
-{}
+void *memset(void *b, int cc, unsigned long len);
+/*@ spec memset(pointer b, i32 cc, u64 len);
+    requires let b_i = (u64) b;
+             let c = (u8) cc;
+             take B = each (u64 i; b_i <= i && i < b_i+len){Byte(array_shift<char>(NULL, i))};
+    ensures take BR = each (u64 i; b_i <= i && i < b_i+len){ByteV(array_shift<char>(NULL,i), c)}; @*/
+
 
 
 
@@ -798,6 +801,3 @@ int hyp_pool_init(struct hyp_pool *pool, u64 pfn, unsigned int nr_pages,
     return 0;
 }
 
-int main(void) {
-    return 0;
-}
