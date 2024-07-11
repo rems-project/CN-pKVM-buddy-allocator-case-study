@@ -27,7 +27,7 @@ struct hyp_page {
 
 extern s64 hyp_physvirt_offset;
 extern struct hyp_page *__hyp_vmemmap;
-/*CN*/ extern void *cn_virt_base;
+/*CN*/ /* extern */ void *cn_virt_base;
 #define hyp_vmemmap ((struct hyp_page *)__hyp_vmemmap)
 
 #define __hyp_pa(virt)    ((phys_addr_t)(virt) + hyp_physvirt_offset)
