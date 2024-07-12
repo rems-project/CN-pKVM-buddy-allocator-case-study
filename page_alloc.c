@@ -675,6 +675,7 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
         /*CN*/}
     if (i >= pool->max_order) {
         /* ----- hyp_spin_unlock(&pool->lock); */
+    cn_print_nr_u64(555555, 555555);
         return NULL;
     }
 
@@ -691,6 +692,7 @@ void *hyp_alloc_pages(struct hyp_pool *pool, u8 order)
     /*CN*//*@ instantiate good<struct hyp_page>, cn_hyp_page_to_pfn(__hyp_vmemmap,p); @*/
     hyp_set_page_refcounted(p);
     /* ----- hyp_spin_unlock(&pool->lock); */
+    cn_print_nr_u64(666666, 666666);
     return CN_COPY_ALLOC_ID(hyp_page_to_virt(p), cn_virt_ptr);
 }
 
