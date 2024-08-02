@@ -26,27 +26,9 @@ struct hyp_pool *init()
   u64 pfn = hyp_phys_to_pfn(range_start);
   u64 npfn = 0-pfn;
 
-
-
-  /* cn_print_nr_u64(0, (unsigned long) start_virt); */
-  /* cn_print_nr_u64(1, (unsigned long) range_start); */
-  /* cn_print_nr_u64(2, (unsigned long) pfn); */
-
   u64 vmemmap_size = sizeof(struct hyp_page) * nr_pages;
   void *start_of_owned_vmemmap = cn_malloc(vmemmap_size);
   __hyp_vmemmap = ((struct hyp_page *) start_of_owned_vmemmap) + npfn;
-
-  /* cn_print_nr_u64(4, (unsigned long) vmemmap_size); */
-  /* cn_print_nr_u64(5, (unsigned long) start_of_owned_vmemmap); */
-  /* cn_print_nr_u64(6, (unsigned long) __hyp_vmemmap); */
-
-  /* unsigned int i = 0; */
-  /* while (i < nr_pages) { */
-  /*   __hyp_vmemmap[i].refcount = 0; */
-  /*   __hyp_vmemmap[i].order = 0; */
-  /*   __hyp_vmemmap[i].flags = 0; */
-  /*   i++; */
-  /* } */
 
 
   struct hyp_pool *pool = cn_calloc(1, sizeof(struct hyp_pool));
@@ -94,7 +76,7 @@ int main(void)
   void *page5 = hyp_alloc_pages(pool, 0);
   void *page6 = hyp_alloc_pages(pool, 0);
   void *page7 = hyp_alloc_pages(pool, 0);
-  
+
   cn_print_nr_u64 (0, page0?1:0);
   cn_print_nr_u64 (1, page1?1:0);
   cn_print_nr_u64 (2, page2?1:0);
