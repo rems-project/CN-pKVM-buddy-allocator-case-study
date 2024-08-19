@@ -289,7 +289,7 @@ predicate void ByteV (pointer virt, u8 the_value)
   return;
 }
 
-predicate void Page (pointer vbase, bool guard, u8 order)
+predicate void Page (pointer vbase, boolean guard, u8 order)
 {
   if (!guard) {
     return;
@@ -303,7 +303,7 @@ predicate void Page (pointer vbase, bool guard, u8 order)
   }
 }
 
-predicate void ZeroPage (pointer vbase, bool guard, u8 order)
+predicate void ZeroPage (pointer vbase, boolean guard, u8 order)
 {
   if (!guard) {
     return;
@@ -332,7 +332,7 @@ function (struct list_head) todo_default_list_head () {
 }
 
 predicate struct list_head AllocatorPage
-    (pointer vbase, bool guard, u8 order)
+    (pointer vbase, boolean guard, u8 order)
 {
   if (!guard) {
     return (todo_default_list_head ());
