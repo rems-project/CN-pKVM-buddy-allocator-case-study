@@ -67,6 +67,13 @@ function (u64) order_align (u64 x, u8 order) {
   x - mod(x, shift_left (1u64, (u64) order))
 }
 
+function (boolean) cellPointer(pointer base, u64 size, u64 starti, u64 endi, pointer p) {
+   let offset = (u64) base - (u64) p;
+   let start = array_shift<char>(base, size * starti);
+   let end = array_shift<char>(base, size * endi);
+   start <= p && p < end && mod(offset, size) == 0u64
+}
+
 // taking the definition from Pages_Aligned.v
 function (u64) page_size_of_order (u8 order) {
   shift_left(1u64, (u64) order + 12u64)
@@ -76,6 +83,8 @@ function (u64) page_size_of_order (u8 order) {
 function (boolean) page_aligned (u64 ptr, u8 order) {
   mod(ptr, page_size_of_order(order)) == 0u64
 }
+
+
 
 
 
