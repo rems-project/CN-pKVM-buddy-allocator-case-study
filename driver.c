@@ -70,41 +70,41 @@ int main(void)
 
   void *page0 = hyp_alloc_pages(pool, 0);
   void *page1 = hyp_alloc_pages(pool, 0);
-  void *page2 = hyp_alloc_pages(pool, 0);
-  void *page3 = hyp_alloc_pages(pool, 0);
-  void *page4 = hyp_alloc_pages(pool, 0);
-  void *page5 = hyp_alloc_pages(pool, 0);
-  void *page6 = hyp_alloc_pages(pool, 0);
-  void *page7 = hyp_alloc_pages(pool, 0);
+  /* void *page2 = hyp_alloc_pages(pool, 0); */
+  /* void *page3 = hyp_alloc_pages(pool, 0); */
+  /* void *page4 = hyp_alloc_pages(pool, 0); */
+  /* void *page5 = hyp_alloc_pages(pool, 0); */
+  /* void *page6 = hyp_alloc_pages(pool, 0); */
+  /* void *page7 = hyp_alloc_pages(pool, 0); */
 
-  cn_print_nr_u64 (0, page0?1:0);
-  cn_print_nr_u64 (1, page1?1:0);
-  cn_print_nr_u64 (2, page2?1:0);
-  cn_print_nr_u64 (3, page3?1:0);
-  cn_print_nr_u64 (4, page4?1:0);
-  cn_print_nr_u64 (5, page5?1:0);
-  cn_print_nr_u64 (6, page6?1:0);
-  cn_print_nr_u64 (7, page7?1:0);
+  /* cn_print_nr_u64 (0, page0?1:0); */
+  /* cn_print_nr_u64 (1, page1?1:0); */
+  /* cn_print_nr_u64 (2, page2?1:0); */
+  /* cn_print_nr_u64 (3, page3?1:0); */
+  /* cn_print_nr_u64 (4, page4?1:0); */
+  /* cn_print_nr_u64 (5, page5?1:0); */
+  /* cn_print_nr_u64 (6, page6?1:0); */
+  /* cn_print_nr_u64 (7, page7?1:0); */
 
-  ((char *)page0)[1234] = 1;
-  ((char *)page1)[1234] = 1;
-  ((char *)page2)[1234] = 1;
-  ((char *)page3)[1234] = 1;
-  ((char *)page4)[1234] = 1;
-  ((char *)page5)[1234] = 1;
-  ((char *)page6)[1234] = 1;
-  ((char *)page7)[1234] = 1;
+  /* ((char *)page0)[1234] = 1; */
+  /* ((char *)page1)[1234] = 1; */
+  /* ((char *)page2)[1234] = 1; */
+  /* ((char *)page3)[1234] = 1; */
+  /* ((char *)page4)[1234] = 1; */
+  /* ((char *)page5)[1234] = 1; */
+  /* ((char *)page6)[1234] = 1; */
+  /* ((char *)page7)[1234] = 1; */
 
   hyp_put_page(pool, page0);
   hyp_put_page(pool, page1);
-  hyp_put_page(pool, page2);
-  hyp_put_page(pool, page3);
-  hyp_put_page(pool, page4);
-  hyp_put_page(pool, page5);
-  hyp_put_page(pool, page6);
-  hyp_put_page(pool, page7);
+  /* hyp_put_page(pool, page2); */
+  /* hyp_put_page(pool, page3); */
+  /* hyp_put_page(pool, page4); */
+  /* hyp_put_page(pool, page5); */
+  /* hyp_put_page(pool, page6); */
+  /* hyp_put_page(pool, page7); */
 
-  void *page = hyp_alloc_pages(pool, 2);
+  /* void *page = hyp_alloc_pages(pool, 2); */
 
   return 0;
 } 
