@@ -13,7 +13,7 @@
 #define bool _Bool
 #define true 1
 
-#pragma clang diagnostic ignored "-Wunused-value"
+//#pragma clang diagnostic ignored "-Wunused-value"
 void *copy_alloc_id(unsigned long long i, void *p) { 
     (unsigned long long) p;
     return (void*) i;
