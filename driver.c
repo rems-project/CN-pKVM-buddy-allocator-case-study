@@ -1,23 +1,25 @@
+
 #define assert(x) ((void) 0)
 
-void cn_print_nr_u64(int, unsigned long);
 
 #include "page_alloc.c"
 
 void *cn_aligned_alloc(size_t align, size_t size);
 void *cn_malloc(unsigned long size);
 void *cn_calloc(size_t num, size_t size);
-void cn_print_u64(const char *, unsigned long);
+void cn_print_u64(const char * x, unsigned long y);
+void cn_print_nr_u64(int x, unsigned long y);
+void cn_print_nr_owned_predicates(void);
+
 
 s64 hyp_physvirt_offset;
  
-struct hyp_pool *init() 
+struct hyp_pool *init(unsigned int nr_pages) 
 /*@ accesses __hyp_vmemmap; hyp_physvirt_offset; cn_virt_ptr;
     ensures take H = Hyp_pool(return, __hyp_vmemmap, cn_virt_ptr, hyp_physvirt_offset); 
 @*/
 {
   hyp_physvirt_offset = 0x0;
-  unsigned int nr_pages = 8;
   unsigned int reserved_pages = 0;
   u8 max_order = 10;
 
@@ -64,48 +66,42 @@ int main(void)
 } 
 */
 
+#define NR_PAGES 8
+
 int main(void)
+/*@ trusted; @*/
 {
-  struct hyp_pool *pool = init();
+  struct hyp_pool *pool = init(NR_PAGES);
 
-  void *page0 = hyp_alloc_pages(pool, 0);
-  void *page1 = hyp_alloc_pages(pool, 0);
-  /* void *page2 = hyp_alloc_pages(pool, 0); */
-  /* void *page3 = hyp_alloc_pages(pool, 0); */
-  /* void *page4 = hyp_alloc_pages(pool, 0); */
-  /* void *page5 = hyp_alloc_pages(pool, 0); */
-  /* void *page6 = hyp_alloc_pages(pool, 0); */
-  /* void *page7 = hyp_alloc_pages(pool, 0); */
+  void *pages[NR_PAGES];
 
-  /* cn_print_nr_u64 (0, page0?1:0); */
-  /* cn_print_nr_u64 (1, page1?1:0); */
-  /* cn_print_nr_u64 (2, page2?1:0); */
-  /* cn_print_nr_u64 (3, page3?1:0); */
-  /* cn_print_nr_u64 (4, page4?1:0); */
-  /* cn_print_nr_u64 (5, page5?1:0); */
-  /* cn_print_nr_u64 (6, page6?1:0); */
-  /* cn_print_nr_u64 (7, page7?1:0); */
+  int i = 0;
+  while (i < NR_PAGES) {
+    pages[i] = hyp_alloc_pages(pool, 0);
+    i++;
+  }
 
-  /* ((char *)page0)[1234] = 1; */
-  /* ((char *)page1)[1234] = 1; */
-  /* ((char *)page2)[1234] = 1; */
-  /* ((char *)page3)[1234] = 1; */
-  /* ((char *)page4)[1234] = 1; */
-  /* ((char *)page5)[1234] = 1; */
-  /* ((char *)page6)[1234] = 1; */
-  /* ((char *)page7)[1234] = 1; */
+  i = 0;
+  while (i < NR_PAGES) {
+    cn_print_nr_u64 (0, pages[i]?1:0);
+    i++;
+  }
 
-  hyp_put_page(pool, page0);
-  hyp_put_page(pool, page1);
-  /* hyp_put_page(pool, page2); */
-  /* hyp_put_page(pool, page3); */
-  /* hyp_put_page(pool, page4); */
-  /* hyp_put_page(pool, page5); */
-  /* hyp_put_page(pool, page6); */
-  /* hyp_put_page(pool, page7); */
+  i = 0;
+  while (i < NR_PAGES) {
+    ((char *)pages[i])[1234] = 1;  
+    i++;
+  }
+
+  i = 0;
+  while (i < NR_PAGES) {
+    hyp_put_page(pool, pages[i]);
+    i++;
+  }
 
   /* void *page = hyp_alloc_pages(pool, 2); */
 
+  cn_print_nr_owned_predicates();
   return 0;
 } 
 
