@@ -35,9 +35,11 @@ extern struct hyp_page *__hyp_vmemmap;
 
 static inline void *hyp_phys_to_virt(phys_addr_t phys)
 /*@ accesses hyp_physvirt_offset; cn_virt_base; @*/
-/*@ requires let virt = phys - (u64) hyp_physvirt_offset; @*/
+/*@ requires has_alloc_id(cn_virt_base); @*/
+/*@ requires let virt = cn__hyp_va(cn_virt_base, hyp_physvirt_offset, phys); @*/
 /*@ ensures {hyp_physvirt_offset} unchanged; @*/
-/*@ ensures (u64) return == virt; @*/
+/*@ ensures {cn_virt_base} unchanged; @*/
+/*@ ensures ptr_eq(return, virt); @*/
 {
     return CN_COPY_ALLOC_ID(__hyp_va(phys), cn_virt_base);
 }
@@ -73,9 +75,13 @@ function (u64) max_pfn ()
 
 static inline u64 hyp_page_to_pfn(struct hyp_page *page)
 /*@ accesses __hyp_vmemmap; @*/
+/*@ requires has_alloc_id(page); @*/
+/*@ requires has_alloc_id(__hyp_vmemmap); @*/
+/*@ requires (alloc_id) page == (alloc_id) __hyp_vmemmap; @*/
+/*@ requires mod((u64)__hyp_vmemmap, sizeof<struct hyp_page>) == 0u64; @*/
 /*@ requires let offs = ((u64) page) - ((u64) __hyp_vmemmap); @*/
 /*@ requires offs <= max_pfn () * (sizeof<struct hyp_page>); @*/
-/*@ requires mod(offs, sizeof<struct hyp_page>) == 0u64; @*/
+/*@ requires mod((u64)page, sizeof<struct hyp_page>) == 0u64; @*/
 /*@ ensures return == offs / (sizeof<struct hyp_page>); @*/
 /*@ ensures {__hyp_vmemmap} unchanged; @*/
 {
