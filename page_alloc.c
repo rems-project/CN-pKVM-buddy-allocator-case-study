@@ -104,8 +104,7 @@ static struct hyp_page *__find_buddy_nocheck(struct hyp_pool *pool,
 /*@ ensures let in_range_buddy = buddy_i >= start_i && buddy_i < end_i; @*/
 /*@ ensures let good_buddy = in_range_buddy; @*/
 /*@ ensures return == (good_buddy ? buddy : NULL); @*/
-/*@ ensures is_null(return) ||
-  (cellPointer(__hyp_vmemmap, (u64) (sizeof<struct hyp_page>), start_i, end_i, buddy) && order_aligned(buddy_i, order) && p != buddy); @*/
+/*@ ensures is_null(return) || (cellPointer(__hyp_vmemmap, (u64) (sizeof<struct hyp_page>), start_i, end_i, buddy) && order_aligned(buddy_i, order) && p != buddy); @*/
 {
     phys_addr_t addr = hyp_page_to_phys(p);
 
@@ -131,6 +130,7 @@ static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
                        struct hyp_page *p,
                        u8 order)
 /*@ accesses hyp_physvirt_offset; __hyp_vmemmap; @*/
+/*@ requires has_alloc_id(p); @*/
 /*@ requires take O1 = Owned(pool); @*/
 /*@ requires hyp_pool_wf(pool, *pool, __hyp_vmemmap, hyp_physvirt_offset); @*/
 /*@ requires let start_i = (*pool).range_start / page_size(); @*/
@@ -153,7 +153,7 @@ static struct hyp_page *__find_buddy_avail(struct hyp_pool *pool,
 /*@ ensures let in_range_buddy = buddy_i >= start_i && buddy_i < end_i; @*/
 /*@ ensures let good_buddy = in_range_buddy && same_order && zero_refcount; @*/
 /*@ ensures return == (good_buddy ? buddy : NULL); @*/
-/*@ ensures is_null(return) || !addr_eq(return, NULL) && (cellPointer(__hyp_vmemmap, (u64) (sizeof<struct hyp_page>), start_i, end_i, buddy) && order_aligned(buddy_i, order) && p != buddy); @*/
+/*@ ensures is_null(return) || (cellPointer(__hyp_vmemmap, (u64) (sizeof<struct hyp_page>), start_i, end_i, buddy) && order_aligned(buddy_i, order) && p != buddy); @*/
 {
     struct hyp_page *buddy = __find_buddy_nocheck(pool, p, order);
 
