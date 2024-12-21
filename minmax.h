@@ -8,3 +8,4 @@
 
 /* #define min(x, y)    __careful_cmp(x, y, <) */
 #define min(x, y)    __cmp(x, y, <)
+#define max(x, y)    __cmp(x, y, >)

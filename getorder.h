@@ -31,6 +31,7 @@
 // CP: adding string.h include
 //#include <string.h>
 long fls64(long x)
+/*@ trusted; @*/
 {
   long flsl(long);
   return flsl(x);

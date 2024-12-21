@@ -1,0 +1,34 @@
+[1/34]: copy_alloc_id -- pass
+[2/34]: list_empty -- pass
+[3/34]: INIT_LIST_HEAD -- pass
+[4/34]: __list_del_entry_valid -- pass
+[5/34]: __list_del -- pass
+[6/34]: __list_del_entry -- pass
+[7/34]: list_del_init -- pass
+[8/34]: __list_add_valid -- pass
+[9/34]: __list_add -- pass
+[10/34]: list_add_tail -- pass
+[11/34]: hyp_phys_to_virt -- fail # fixed
+[12/34]: hyp_virt_to_phys -- pass
+[13/34]: hyp_page_to_pfn -- fail # fixed
+[14/34]: hyp_page_count -- pass
+[15/34]: hyp_page_ref_inc -- pass
+[16/34]: hyp_page_ref_dec -- pass
+[17/34]: hyp_page_ref_dec_and_test -- pass
+[18/34]: hyp_set_page_refcounted -- pass
+[19/34]: hyp_alloc_pages -- fail
+[20/34]: hyp_get_page -- pass
+[21/34]: hyp_put_page -- fail
+[22/34]: hyp_pool_init -- fail
+[23/34]: __find_buddy_nocheck -- fail # fixed
+[24/34]: __find_buddy_avail -- pass
+[25/34]: page_remove_from_list -- fail # fixed
+[26/34]: page_remove_from_list_pool -- fail # fixed
+[27/34]: page_add_to_list -- fail # fixed
+[28/34]: page_add_to_list_pool -- fail # probably fixed
+[29/34]: page_add_to_list_pool_ex1 -- fail # probably fixed
+[30/34]: node_to_page -- pass
+[31/34]: __hyp_attach_page -- fail
+[32/34]: __hyp_extract_page -- fail
+[33/34]: __hyp_put_page -- fail
+[34/34]: fls64 -- fail

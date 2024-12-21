@@ -176,6 +176,10 @@ function (boolean) vmemmap_wf (u64 page_index,
     && (page_group_ok(page_index, vmemmap, pool))
 }
 
+function (boolean) eq_t(pointer x, pointer y) {
+    ptr_eq(x,y) || !addr_eq(x,y)
+}
+
 function (boolean) vmemmap_l_wf (u64 page_index, i64 physvirt_offset,
         pointer virt_ptr,
         map <u64, struct hyp_page> vmemmap, map <u64, struct list_head> APs,
@@ -212,7 +216,11 @@ function (boolean) vmemmap_l_wf (u64 page_index, i64 physvirt_offset,
   // there is no self-loop case for this node type, as it is cleared unless it is
   // present in the per-order free list - TODO delete?
   let nonempty_clause = (prev != self_node_pointer) && (next != self_node_pointer);
-  (prev_clause && next_clause)
+  let eq_testable = eq_t(prev, self_node_pointer)
+                    && eq_t(prev, pool_free_area_pointer)
+                    && eq_t(next, prev)
+                    && eq_t(next, pool_free_area_pointer);
+  (prev_clause && next_clause && eq_testable)
 }
 
 
@@ -265,7 +273,7 @@ function (boolean) hyp_pool_wf (pointer pool_pointer, struct hyp_pool pool,
     (range_start < range_end)
     && (range_end < shift_left(1u64, 52u64))
     && (physvirt_offset < (i64) range_start) // use '<='
-    && (mod((u64) physvirt_offset, (page_size ())) == 0u64)
+    && mod((u64) physvirt_offset, page_size ()) == 0u64
     && (((range_start / (page_size ())) * (page_size ())) == range_start)
     && (((range_end / (page_size ())) * (page_size ())) == range_end)
     && (pool.max_order <= (max_order ()))
@@ -305,9 +313,7 @@ predicate void Page (pointer vbase, boolean guard, u8 order)
   }
   else {
     let length = page_size_of_order(order);
-    let vbaseI = (u64) vbase;
-    take Bytes = each (u64 i; (vbaseI <= i) && (i < (vbaseI + length)))
-         {Byte(array_shift<char>(NULL, i))};
+    take Bytes = each (u64 i; 0u64 <= i && i < length) {Byte(array_shift<char>(vbase, i))};
     return;
   }
 }
@@ -318,21 +324,18 @@ predicate void ZeroPage (pointer vbase, boolean guard, u8 order)
     return;
   }
   else {
-    let length = page_size_of_order(order);
-    let vbaseI = ((u64) vbase);
-    take Bytes = each (u64 i; (vbaseI <= i) && (i < (vbaseI + length)))
-         {ByteV(array_shift<char>(NULL, i), 0u8)};
+    let length = sizeof<struct list_head>;
+    take B1 = each (u64 i; 0u64 <= i && i < length) {ByteV(array_shift<char>(vbase, i), 0u8)};
+    take B2 = each (u64 i; length <= i && i < page_size_of_order(order)) {ByteV(array_shift<char>(vbase, i), 0u8)};
     return;
   }
 }
 
-predicate void AllocatorPageZeroPart (pointer zero_start, u8 order)
+predicate void AllocatorPageZeroPart (pointer vbase, u8 order)
 {
-  let start = (u64) zero_start;
   let region_length = page_size_of_order(order);
-  let length = region_length - sizeof<struct list_head>;
-  take Bytes = each (u64 i; (start <= i) && (i < (start + length)))
-       {ByteV(array_shift<char>(NULL, i), 0u8)};
+  take Bytes = each (u64 i; sizeof<struct list_head> <= i && i < region_length)
+      {ByteV(array_shift<char>(vbase, i), 0u8)};
   return;
 }
 
@@ -347,9 +350,8 @@ predicate struct list_head AllocatorPage
     return (todo_default_list_head ());
   }
   else {
-    let zero_start = array_shift<struct list_head>(vbase, 1u8);
-    take ZeroPart = AllocatorPageZeroPart (zero_start, order);
     take Node = Owned<struct list_head>(vbase);
+    take ZeroPart = AllocatorPageZeroPart (vbase, order);
     return Node;
   }
 }
