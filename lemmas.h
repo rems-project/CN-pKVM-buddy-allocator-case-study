@@ -168,4 +168,10 @@ lemma bytes_to_struct_list_head(pointer node, // struct list_head *
   requires take B = each (u64 i; 0u64 <= i && i < sizeof<struct list_head>) {ByteV(array_shift<char>(node, i), 0u8)};
   ensures take Node = Owned<struct list_head>(node);
 
+lemma merge_zero_pages(pointer min, u8 order)
+requires
+    take Z1 = ZeroPage(min, true, order);
+    take Z2 = ZeroPage(array_shift<char>(min, page_size_of_order(order)), true, order);
+ensures
+    take Z3 = ZeroPage(min, true, order + 1u8);
 @*/
